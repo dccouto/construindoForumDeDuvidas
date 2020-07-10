@@ -3,11 +3,13 @@ package br.com.diego.forum.controller;
 import java.net.URI;
 import java.util.List;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +60,7 @@ public class TopicoController {
 	
 	
 	@PostMapping("topico")
+	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
 	public ResponseEntity<TopicoDto> cadastrar(@Valid @RequestBody TopicoForm form, UriComponentsBuilder uriBuilder) {
 		
 		Topico topico = form.convertParaTopico(cursoRepository);
@@ -69,6 +72,7 @@ public class TopicoController {
 	}
 	
 	@PutMapping("topico")
+	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
 	public TopicoDto atualizar(@Valid @RequestBody AtualizacaoTopicoForm form) {
 		if(!topicoRepository.existsById(form.getId())) {
 			return null;
@@ -76,6 +80,19 @@ public class TopicoController {
 		Topico topico = form.atualiza(topicoRepository);
 		
 		return TopicoDto.converterTopico(topico);
+	}
+	
+	@DeleteMapping("topico/{id}")
+	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
+	public ResponseEntity<?> remover(@PathVariable(name="id") long id) {
+		
+		if(!topicoRepository.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		topicoRepository.deleteById(id);
+		return ResponseEntity.ok().build();
+
 	}
 	
 }
