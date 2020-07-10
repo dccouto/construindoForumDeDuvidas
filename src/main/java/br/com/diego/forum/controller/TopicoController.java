@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.diego.forum.controller.dto.DetalhesTopicoDto;
 import br.com.diego.forum.controller.dto.TopicoDto;
+import br.com.diego.forum.controller.form.AtualizacaoTopicoForm;
 import br.com.diego.forum.controller.form.TopicoForm;
 import br.com.diego.forum.model.Topico;
 import br.com.diego.forum.repository.CursoRepository;
@@ -64,6 +66,16 @@ public class TopicoController {
 		URI uri = uriBuilder.path("/api/topico/{id}").buildAndExpand(topicoSalvo.getId()).toUri();
 		
 		return ResponseEntity.created(uri).body(new TopicoDto(topicoSalvo));
+	}
+	
+	@PutMapping("topico")
+	public TopicoDto atualizar(@Valid @RequestBody AtualizacaoTopicoForm form) {
+		if(!topicoRepository.existsById(form.getId())) {
+			return null;
+		}
+		Topico topico = form.atualiza(topicoRepository);
+		
+		return TopicoDto.converterTopico(topico);
 	}
 	
 }
