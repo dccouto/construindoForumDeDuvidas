@@ -33,10 +33,14 @@ public class TopicoDto {
 		return dataCriacao;
 	}
 
-	public static List<TopicoDto> converter(List<Topico> topicos) {
+	public static List<TopicoDto> converterListaTopico(List<Topico> topicos) {
 		
 		return topicos.stream().map(TopicoDto::new).collect(Collectors.toList());
 	}
 	
+	public static TopicoDto converterTopico(Topico topico) {
+		
+		return new TopicoDto(topico);
+	}
 
 }

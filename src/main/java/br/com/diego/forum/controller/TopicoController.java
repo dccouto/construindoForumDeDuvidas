@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.diego.forum.controller.dto.DetalhesTopicoDto;
 import br.com.diego.forum.controller.dto.TopicoDto;
 import br.com.diego.forum.controller.form.TopicoForm;
 import br.com.diego.forum.model.Topico;
@@ -37,15 +38,21 @@ public class TopicoController {
 	@GetMapping("topicos")
 	public List<TopicoDto> listaTopicos() {
 		
-		return TopicoDto.converter(topicoRepository.findAll());
+		return TopicoDto.converterListaTopico(topicoRepository.findAll());
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("topico/nome-curso/{nome}")
 	public List<TopicoDto> listaTopicosPorNome(@PathVariable(value="nome") String nome) {
 
-		return TopicoDto.converter(topicoRepository.findByCurso_Nome(nome));
+		return TopicoDto.converterListaTopico(topicoRepository.findByCurso_Nome(nome));
 	}
+	
+	@GetMapping("topico/{id}")
+	public DetalhesTopicoDto detalharTopico(@PathVariable(name="id") long id) {
+		return new DetalhesTopicoDto(topicoRepository.getOne(id));
+	}
+
 	
 	
 	@PostMapping("topico")
@@ -58,4 +65,15 @@ public class TopicoController {
 		
 		return ResponseEntity.created(uri).body(new TopicoDto(topicoSalvo));
 	}
+	
 }
+
+
+
+
+
+
+
+
+
+
