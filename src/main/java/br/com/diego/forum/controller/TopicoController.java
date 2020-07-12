@@ -7,6 +7,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -39,22 +43,30 @@ public class TopicoController {
 	private CursoRepository cursoRepository;
 	
 	
-	@GetMapping("topicos")
-	public List<TopicoDto> listaTopicos() {
+	@GetMapping("topicos/{pagina}/{quantidade}")
+	public Page<TopicoDto> listaTopicos(@PathVariable int pagina, @PathVariable int quantidade) {
 		
-		return TopicoDto.converterListaTopico(topicoRepository.findAll());
+		Pageable paginacao = PageRequest.of(pagina, quantidade);
+		
+		return TopicoDto.converterListaTopico(topicoRepository.findAll(paginacao));
 	}
 	
+	
+	
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping("topico/nome-curso/{nome}")
-	public ResponseEntity<List<TopicoDto>> listaTopicosPorNome(@PathVariable(value="nome") String nome) {
+	@GetMapping("topico/nome-curso/{nome}/{pagina}/{quantidade}")
+	public ResponseEntity<Page<TopicoDto>> listaTopicosPorNome(@PathVariable(value="nome") String nome, @PathVariable int pagina, @PathVariable int quantidade) {
 
-		List<TopicoDto> listaTopico = TopicoDto.converterListaTopico(topicoRepository.findByCurso_Nome(nome));
+		Pageable paginacao = PageRequest.of(pagina, quantidade);
+
+		Page<TopicoDto> listaTopico = TopicoDto.converterListaTopico(topicoRepository.findByCurso_Nome(nome, paginacao));
 		if(listaTopico.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.ok(listaTopico);
 	}
+	
+	
 	
 	@GetMapping("topico/{id}")
 	public ResponseEntity<DetalhesTopicoDto> detalharTopico(@PathVariable(name="id") long id) {
