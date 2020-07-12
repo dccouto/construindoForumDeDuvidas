@@ -1,7 +1,6 @@
 package br.com.diego.forum.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -10,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,9 +43,10 @@ public class TopicoController {
 	
 	
 	@GetMapping("topicos")
-	public Page<TopicoDto> listaTopicos(@RequestParam int pagina, @RequestParam int quantidade, @RequestParam String ordenacao) {
+	public Page<TopicoDto> listaTopicos(@PageableDefault(page= 0 , size=10) Pageable paginacao) {//Pageable recebe automaticamento os parâmetros 
+		//da url, é necessário colocar os nome em inglês. Ex: page, size, order.
+		//(verificar o Main, pois é necessário colocar uma anotation a mais para funcionar)
 		
-		Pageable paginacao = PageRequest.of(pagina, quantidade, Direction.DESC, ordenacao);
 		
 		return TopicoDto.converterListaTopico(topicoRepository.findAll(paginacao));
 	}
@@ -55,7 +54,7 @@ public class TopicoController {
 	
 	
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping("topico/nome-curso/{nome}/{pagina}/{quantidade}")
+	@GetMapping("topico/nome-curso/{nome}/{pagina}/{quantidade}")//Exemplo de paginação como o Pageable do spring
 	public ResponseEntity<Page<TopicoDto>> listaTopicosPorNome(@PathVariable(value="nome") String nome, @PathVariable int pagina, @PathVariable int quantidade) {
 
 		Pageable paginacao = PageRequest.of(pagina, quantidade);
