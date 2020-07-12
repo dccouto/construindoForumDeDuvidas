@@ -47,14 +47,23 @@ public class TopicoController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("topico/nome-curso/{nome}")
-	public List<TopicoDto> listaTopicosPorNome(@PathVariable(value="nome") String nome) {
+	public ResponseEntity<List<TopicoDto>> listaTopicosPorNome(@PathVariable(value="nome") String nome) {
 
-		return TopicoDto.converterListaTopico(topicoRepository.findByCurso_Nome(nome));
+		List<TopicoDto> listaTopico = TopicoDto.converterListaTopico(topicoRepository.findByCurso_Nome(nome));
+		if(listaTopico.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(listaTopico);
 	}
 	
 	@GetMapping("topico/{id}")
-	public DetalhesTopicoDto detalharTopico(@PathVariable(name="id") long id) {
-		return new DetalhesTopicoDto(topicoRepository.getOne(id));
+	public ResponseEntity<DetalhesTopicoDto> detalharTopico(@PathVariable(name="id") long id) {
+		
+		if(!topicoRepository.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.ok(new DetalhesTopicoDto(topicoRepository.getOne(id)));
 	}
 
 	

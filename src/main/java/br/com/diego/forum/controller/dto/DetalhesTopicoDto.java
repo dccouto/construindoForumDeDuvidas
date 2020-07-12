@@ -29,6 +29,8 @@ public class DetalhesTopicoDto {
 		this.resposta = new ArrayList<>();
 		this.resposta.addAll(topico.getRespostas().stream().map(RespostaDto::new).collect(Collectors.toList()));
 	}
+	public DetalhesTopicoDto() {
+	}
 
 
 	public Long getId() {
