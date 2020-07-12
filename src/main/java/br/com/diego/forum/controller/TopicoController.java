@@ -6,6 +6,8 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +43,7 @@ public class TopicoController {
 	@Autowired
 	private CursoRepository cursoRepository;
 	
-	
+	@Cacheable(value="listaTopicos")//habilita o cache e seta uma 'apelido' para ele
 	@GetMapping("topicos")
 	public Page<TopicoDto> listaTopicos(@PageableDefault(page= 0 , size=10) Pageable paginacao) {//Pageable recebe automaticamento os parâmetros 
 		//da url, é necessário colocar os nome em inglês. Ex: page, size, order.
@@ -82,6 +84,7 @@ public class TopicoController {
 	
 	@PostMapping("topico")
 	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
+	@CacheEvict(value="listaTopicos", allEntries=true)//limpa todas as entradas do cache com o apelido 'listaTopicos' quando esse controller for chamado
 	public ResponseEntity<TopicoDto> cadastrar(@Valid @RequestBody TopicoForm form, UriComponentsBuilder uriBuilder) {
 		
 		Topico topico = form.convertParaTopico(cursoRepository);
@@ -94,6 +97,7 @@ public class TopicoController {
 	
 	@PutMapping("topico")
 	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
+	@CacheEvict(value="listaTopicos", allEntries=true)//limpa todas as entradas do cache com o apelido 'listaTopicos' quando esse controller for chamado
 	public TopicoDto atualizar(@Valid @RequestBody AtualizacaoTopicoForm form) {
 		if(!topicoRepository.existsById(form.getId())) {
 			return null;
@@ -105,6 +109,7 @@ public class TopicoController {
 	
 	@DeleteMapping("topico/{id}")
 	@Transactional //Nesse caso não seria necessário, mas pode ser que em algum banco de dados solicite, a doc diz que todos os post, put e delete precisa
+	@CacheEvict(value="listaTopicos", allEntries=true)//limpa todas as entradas do cache com o apelido 'listaTopicos' quando esse controller for chamado
 	public ResponseEntity<?> remover(@PathVariable(name="id") long id) {
 		
 		if(!topicoRepository.existsById(id)) {
