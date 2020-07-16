@@ -14,12 +14,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import br.com.diego.forum.repository.UsuarioRepository;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	AutenticacaoService autenticacaoService;
+	
+	@Autowired
+	private TokenService tokenService;
+	
+	@Autowired
+	private UsuarioRepository repository;
+
 	
 	
 	@Override
@@ -46,7 +55,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 			.anyRequest().authenticated()//demais rotas somente autenticado
 			.and().csrf().disable() //csrf pode ser usado em um tipo de ataque hacker
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //Essa linha diz para o sprint que não é para criar sessão quando fizer login
-			.and().addFilterBefore(new AutenticacaoViaTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+			.and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, repository), UsernamePasswordAuthenticationFilter.class);
 	}
 	
 	//Configurações de recursos estáticos (javascript, css, imagens...)
